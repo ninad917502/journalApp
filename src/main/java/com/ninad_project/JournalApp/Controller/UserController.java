@@ -1,7 +1,9 @@
 package com.ninad_project.JournalApp.Controller;
 
+import com.ninad_project.JournalApp.ApiResponce.WheatherResponce;
 import com.ninad_project.JournalApp.Entity.User;
 import com.ninad_project.JournalApp.Service.UserService;
+import com.ninad_project.JournalApp.Service.WheatherService;
 import com.ninad_project.JournalApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,12 +26,13 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping
+    @Autowired
+    private WheatherService wheatherService;
+
+    @GetMapping("/all")
     public List<User> getAllUsers(){
         return userService.getAll();
     }
-
-
 
     @PutMapping
     public ResponseEntity<User> updateuser(@RequestBody  User user){
@@ -50,6 +53,17 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         userRepository.deleteByUsername(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> greeting() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        WheatherResponce wheatherResponce = wheatherService.getWheather("Mumbai");
+        String greeting = "";
+        if (wheatherResponce != null){
+            greeting = (", Weather feels like "+ wheatherResponce.getCurrent().getFeelslike());
+        }
+        return new ResponseEntity<>("Hii " + authentication.getName()+ greeting, HttpStatus.OK);
     }
 
 }
