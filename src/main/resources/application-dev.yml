@@ -1,4 +1,7 @@
 spring:
+  redis:
+    host: 172.28.112.1
+    port: 6379
   data:
     mongodb:
       uri: mongodb+srv://ninadbhagat1:Ninadbhagat123@cluster0.qrqoyjp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0

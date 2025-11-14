@@ -2,6 +2,7 @@ package com.ninad_project.JournalApp.Service;
 
 import com.ninad_project.JournalApp.ApiResponce.WheatherResponce;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -16,10 +17,22 @@ public class WheatherService {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    private RedisService redisService;
+
     public WheatherResponce getWheather(String city){
-        String finalAPI = API.replace("CITY", city).replace("API_KEY", apiKey);
-        ResponseEntity<WheatherResponce> response = restTemplate.exchange(finalAPI, HttpMethod.GET, null, WheatherResponce.class);
-        WheatherResponce body = response.getBody();
-        return body;
+        WheatherResponce wheatherResponce = redisService.get("weather_of_" + city, WheatherResponce.class);
+        if(wheatherResponce != null){
+            return wheatherResponce;
+        }else{
+            String finalAPI = API.replace("CITY", city).replace("API_KEY", apiKey);
+            ResponseEntity<WheatherResponce> response = restTemplate.exchange(finalAPI, HttpMethod.GET, null, WheatherResponce.class);
+            WheatherResponce body = response.getBody();
+            if(body != null){
+               redisService.set("weather_of_" + city,body,300l);
+            }
+            return body;
+        }
+
     }
 }

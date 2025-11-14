@@ -6,7 +6,6 @@ import com.ninad_project.JournalApp.Service.EmailService;
 import com.ninad_project.JournalApp.Service.SentimentAnalysisService;
 import com.ninad_project.JournalApp.repository.UserRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
@@ -25,7 +24,7 @@ public class UserScheduler {
     @Autowired
     private SentimentAnalysisService sentimentAnalysisService;
 
-   @Scheduled(cron = "0 0 9 * * SUN")   //It Runs self automatically
+   @Scheduled(cron = "0 0 9 * * SUN")     //It Runs self automatically
     public void FetchUserAndSendSaMail(){
         List<User> users = userRepository.getUserForSA();
         for( User user : users){

@@ -29,7 +29,7 @@ public class JournalEntryController {
     private UserService userService;
 
 
-    @GetMapping()
+    @GetMapping("/all")
     public ResponseEntity<?> getAllJournalEntriesOfUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
