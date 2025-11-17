@@ -36,8 +36,14 @@ public class PublicController {
     }
 
     @PostMapping("/signup")
-    public void createUser(@RequestBody User user){
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
         userService.saveNewUser(user);
+        return ResponseEntity.ok("User SignIn Successfully ");
+    }catch (Exception e){
+            log.error("Failed to create user: {}", user.getUsername(), e );
+            return ResponseEntity.badRequest().body("signIn Failed Try again");
+        }
     }
 
     @PostMapping("/login")

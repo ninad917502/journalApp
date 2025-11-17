@@ -8,19 +8,22 @@ import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "TaK+HaV^uvCHEFsEVfypW#7g9^k*Z8$V";
+    private String SECRET_KEY = "TaK+HaV^uvCHEFsEVfypW#7g9^k*Z8$V";
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
     public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+        Claims claims = extractAllClaims(token);
+        return claims.getSubject();
     }
 
     public Date extractExpiration(String token) {
@@ -40,16 +43,24 @@ public class JwtUtil {
     }
 
     public String generateToken(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username);
+    }
+
+    private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .claims(claims)
+                .subject(subject)
+                .header().empty().add("typ","JWT")
+                .and()
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // 5 minutes expiration time
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    public Boolean validateToken(String token , UserDetails userDetails) {
+        return !isTokenExpired(token);
     }
+
 }
